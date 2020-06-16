@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+   integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+   crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+   integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+   crossorigin=""></script>
+
+    <!-- multirange - Thanks Lea Verou! -->
+    <link rel="stylesheet" href="lib/multirange.css">
+    <script src="lib/multirange.js"></script>
+
+
+    <title>Safe Streets Leeds Explorer</title>
+
+    <style>
+      #ssmap { margin: 15px; height: 1200px; border: solid 2px #343a40; }
+      #footer { color: white; margin-top: 2rem;}
+      body { background-color: #343a40; }
+      #main { background-color: #eee; color: #333; }
+      h2 { margin-top: 0.5rem; }
+      .leaflet-container { font-size: 1rem; }
+
+      .iwlab { font-weight: bold; }
+      .iwval { color: #444; }
+
+      /* feeling colours */
+      .flvn { background-color: #d61b38 !important; }
+      .flsn { background-color: #ff7f00 !important; }
+      .fln  { background-color: #f3b213 !important; }
+      .flsp { background-color: #c4ba3d !important; }
+      .flp  { background-color: #7fb438 !important; }
+
+      .btn { margin-bottom: 5px; margin-right: 5px;}
+
+      #date_sel > input {
+        width: 400px;
+      }
+      .dr_lab {
+        width: 5em;
+      }
+      
+    </style>
+
+  </head>
+  <body>
+    <!-- header -->
+    <nav class="navbar navbar-dark bg-dark">
+      <span class="navbar-brand mb-0 h1">Safe Streets Leeds Explorer</span>
+      <span class="navbar-brand"><small>Analyze data collected for the <a href="https://leedscovidsuggestascheme.commonplace.is/">Safe Streets Leeds</a> initiative</small></span>
+    </nav>
+
+    <!-- main content -->
+    <div id="main" class="container-fluid">
+      <div class="row">
+        <div id="ssmap" class="col-lg"></div>
+        <div id="controls" class="col-lg">
+
+          <h2>Feature</h2>
+          <div id="main_type_tags"></div>
+
+          <h2>Theme</h2>
+          <div id="main_theme_tags"></div>
+
+          <h2>Reason/Issue tags</h2>
+          <div id="main_issue_tags"></div>
+
+          <h2>Suggestion tags</h2>
+          <div id="main_solution_tags"></div>
+
+          <h2>Comments</h2>
+          <form onsubmit="SS.filter(event, 'comment', 'input')">
+            <div class="form-inline">
+              <label class="sr-only" for="comment_search">Search</label>
+              <input type="text" class="form-control mb-1 mr-sm-1" size="35" id="comment_search" placeholder="Search for a word (e.g., nearly, accident)">
+              <button type="submit" class="btn btn-secondary">Search</button>
+            </div>
+          </form>
+
+          <h2>Importance of acess by healthy walking/cycle</h2>
+          <button type="button" class="btn btn-secondary" onclick="SS.filter(event, 'feeling', '')">All</button><button type="button" class="btn btn-secondary flvn" onclick="SS.filter(event, 'feeling', 0)">Very important</button><button type="button" class="btn btn-secondary flsn" onclick="SS.filter(event, 'feeling', 25)">Somewhat important</button><button type="button" class="btn btn-secondary fln" onclick="SS.filter(event, 'feeling', 50)">Neutral</button><button type="button" class="btn btn-secondary flsp" onclick="SS.filter(event, 'feeling', 75)">Less important</button><button type="button" class="btn btn-secondary flp" onclick="SS.filter(event, 'feeling', 100)">Not very important</button>
+          <small>NOTE: These classifications likely have little meaning due to the convoluted survey question used to gather data.</small><br>
+          <!-- alternate buttons -->
+          <!--
+          <button type="button" class="btn btn-secondary flvn" onclick="SS.filter(event, 'feeling', 0)">Very negative</button>
+          <button type="button" class="btn btn-secondary flsn" onclick="SS.filter(event, 'feeling', 25)">Somewhat negative</button>
+          <button type="button" class="btn btn-secondary fln" onclick="SS.filter(event, 'feeling', 50)">Neutral</button>
+          <button type="button" class="btn btn-secondary flsp" onclick="SS.filter(event, 'feeling', 75)">Somewhat positive</button>
+          <button type="button" class="btn btn-secondary flp" onclick="SS.filter(event, 'feeling', 100)">Positive</button>
+          -->
+
+          <h2>Resize symbols</h2>
+          <button type="button" class="btn btn-secondary" onclick="SS.resize_symbols('votes')">Agreements</button>
+          <button type="button" class="btn btn-secondary" onclick="SS.resize_symbols('uniform')">Uniform</button>
+
+          <h2>Submission date</h2>
+          <div id="date_sel">
+            <label id="date_range_from" class="dr_lab mr-sm-2">Date</label>
+            <input id="date_range" class="mr-sm-2" type="range" multiple data-drag-middle value="0,100" oninput="SS.dfilter()"/>
+            <label id="date_range_to" class="dr_lab">Date</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- footer -->
+    <div id="footer" class="container-fluid bg-dark">
+      <div class="row">
+        <div class="col-lg">
+          <p>Created by Cyrille M&eacute;dard de Chardon. Code available <a href="https://github.com/serialc/Safe-Streets-Leeds-Explorer">Github</a>.</p>
+          <p>Safe Streets Leeds data from: <a href="https://leedscovidsuggestascheme.commonplace.is/">Safe Streets Leeds</a> contributors.</p>
+        </div>
+        <div class="col-lg">
+          <p>Base map data from: &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery &copy; <a href="https://mapbox.com/">Mapbox</a>.</p>
+          <p>Uses libraries: <a href="https://leafletjs.com/">Leaflet</a>, <a href="https://getbootstrap.com/">Bootstrap 4.5</a> and <a href="https://leaverou.github.io/multirange/">multirange</a>.
+        </div>
+      </div>
+    </div>
+
+    <script src="js/ss.js"></script>
+
+  </body>
+</html>
