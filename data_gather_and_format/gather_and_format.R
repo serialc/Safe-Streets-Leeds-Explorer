@@ -42,7 +42,6 @@ download.file(cmnts_url, json_file)
 # import to R, convert from JSON
 cmnts <- rjson::fromJSON(file = json_file, unexpected.escape = "skip")
 
-
 # fields of interest (LEEDS)
 foi <- list(
   comment=       "anythingElse",
@@ -61,11 +60,11 @@ foi <- list(
   #short_desc="whatAreYouCommentingOn")
 
 cmnts_clean <- lapply(cmnts, function(x) {
-  # x <- cmnts[[4193]]
+  # x <- cmnts[[4200]]
   cid <- x$id
   feeling <- x$properties$feeling # 0,25, 50, 75, or 100
-  #consent <- x$properties$consent
-  if( is.null(consent)) { consent <- NA}
+  consent_tf <- x$properties$consent
+  if( is.null(consent_tf) | length(consent_tf) != 1 ) { consent_tf <- NA}
   subdate <- x$properties$date
   votes <- x$properties$agree$number
   url <- strsplit(x = x$shortUrl, split = "[?]")[[1]][1]
@@ -96,6 +95,7 @@ cmnts_clean <- lapply(cmnts, function(x) {
     title <- xfoir$name
   }
   
+  perm <- xfoir$want_perm
   if( is.null(perm)) { perm <- NA}
   comment <- gsub(pattern = "\n", replacement = "<br>", x = xfoir$comment)
   issues_csv <- xfoir$issue_tags
@@ -105,7 +105,7 @@ cmnts_clean <- lapply(cmnts, function(x) {
   return(data.frame(title=title,
                     cid=cid,
                     feeling=feeling,
-                    #consent=consent,
+                    consent=consent_tf,
                     theme=theme,
                     subdate=subdate,
                     votes=votes,
