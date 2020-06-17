@@ -23,7 +23,7 @@ bounds <- st_sfc(st_polygon(list(fwm[c(1:nrow(fwm),1),]), dim = 'XY'))
 st_crs(bounds) <- 4326
 
 # Leeds bounds data are meaningless
-plot(bounds)
+#plot(bounds)
 # don't bother saving
 
 #save_polygon <- '../data/map_bounds.geojson'
@@ -31,7 +31,7 @@ plot(bounds)
 #write_sf(bounds, dsn=save_polygon)
 
 # help build HTML
-fw$questions
+#fw$questions
 
 ########## get the comments ############# ##################
 
@@ -140,7 +140,7 @@ ss$abdate[dt_in_mins_ago] <- strftime(now - (as.integer(unlist(strsplit(x = ss[d
 if( any(is.na(ss$abdate)) ) {
   if( file.exists('data/cid_abdates_key.RData') ) {
     load(file='data/cid_abdates_key.RData') # cid_abdates
-    fss <- merge(ss, cid_abdates, by='cid')
+    fss <- merge(ss, cid_abdates, by='cid', all = T)
     fixables <- is.na(fss$abdate.x) & !is.na(fss$abdate.y)
     fss$abdate.x[fixables] <- fss$abdate.y[fixables]
     fss$abdate.y <- NULL
