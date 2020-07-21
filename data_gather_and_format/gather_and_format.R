@@ -173,7 +173,7 @@ if( any(is.na(ss$abdate)) ) {
 # check again
 if(any(is.na(ss$abdate))) {
   print("Problem comments:")
-  ss$subdate[is.na(ss$abdate)]
+  print(ss$subdate[is.na(ss$abdate)])
 }
 
 # save good ones for next run
