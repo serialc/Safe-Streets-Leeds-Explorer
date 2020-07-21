@@ -136,6 +136,13 @@ ss$abdate[dt_in_hours_ago] <- strftime(now - (as.integer(unlist(strsplit(x = ss[
 ss$abdate[dt_an_hour_ago] <- strftime(now - (60 * 60), "%Y-%m-%d")
 ss$abdate[dt_in_mins_ago] <- strftime(now - (as.integer(unlist(strsplit(x = ss[dt_in_mins_ago,"subdate"], split = " minutes ago"))) * 60), "%Y-%m-%d")
 
+# check for some we've missed decoding 
+if(any(is.na(ss$abdate))) {
+  print("Potential problem comments:")
+  print(ss$subdate[is.na(ss$abdate)])
+  print("Will try to fix.")
+}
+
 # check we got them all otherwise resolve
 if( any(is.na(ss$abdate)) ) {
   if( file.exists('data/cid_abdates_key.RData') ) {
@@ -164,8 +171,15 @@ if( any(is.na(ss$abdate)) ) {
 }
 
 # check again
-any(is.na(ss$abdate))
-ss$subdate[is.na(ss$abdate)]
+if(any(is.na(ss$abdate))) {
+  print("Problem comments:")
+  ss$subdate[is.na(ss$abdate)]
+}
+
+# save good ones for next run
+cid_abdates <- ss[!is.na(ss$abdate),c('cid', 'abdate')]
+save(cid_abdates, file='data/cid_abdates_key.RData')
+
 
 # filter out bad data
 # hack, but works for now
